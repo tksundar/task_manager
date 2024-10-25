@@ -90,7 +90,7 @@ class TaskManager:
 
     def authenticate(self, email, password):
         if email in self.users.keys():
-            return self.users.get(email).password == password
+            return self.users.get(email).authenticate(email,password)
         return False
 
     def register(self, new_user):
@@ -128,7 +128,7 @@ class TaskManager:
         display_tasks(stored_tasks)
         return added
 
-    def process_delete(self, tasks_for_user):
+    def process_delete(self,email, tasks_for_user):
         self.tasks.update({email: tasks_for_user})
         serialize(self.tasks, task_file)
         print('Task(s) deleted')
@@ -144,10 +144,10 @@ class TaskManager:
                     return True
             else:
                 tasks_for_user.clear()
-                self.process_delete(tasks_for_user)
+                self.process_delete(email,tasks_for_user)
                 return True
 
-    def mark(self, t):
+    def mark(self,email, t):
         t.mark_complete()
         print('\nTask %s marked complete ' % t.task_name)
         serialize(self.tasks, task_file)
@@ -159,130 +159,132 @@ class TaskManager:
         for t in self.tasks.get(email):
             if not mark_all:
                 if t.task_name == task.task_name:
-                    done = self.mark(t)
+                    done = self.mark(email,t)
             else:
-                done = self.mark(t)
+                done = self.mark(email,t)
 
         return done
+class Main:
+    def get_email_pwd(self):
+        email_id = input("email id: ")
+        pwd = input("password: ")
+        return email_id, pwd
 
 
-def get_email_pwd():
-    email_id = input("email id: ")
-    pwd = input("password: ")
-    return email_id, pwd
+    def login(self,manager: TaskManager):
+        os.system('cls')
+        print('\n\nTask Manager Login...\n')
+        (email_id, pwd) = self.get_email_pwd()
+        status = manager.authenticate(email_id,pwd)
+        return (status, email_id)
 
 
-def login(manager: TaskManager):
-    os.system('cls')
-    print('\n\nTask Manager Login...\n')
-    (email_id, pwd) = get_email_pwd()
-    status = manager.authenticate(email_id, pwd)
-    return (status, email_id)
+    def register(self,manager: TaskManager):
+        print('\n\n Task Manager Registration...\n')
+        name = input("Name: ")
+        (email_id, pwd) = self.get_email_pwd()
+        print(name, email_id, pwd)
+        status = manager.register(User(name, email_id, pwd))
+        return (status, email_id)
 
 
-def register(manager: TaskManager):
-    print('\n\n Task Manager Registration...\n')
-    name = input("Name: ")
-    (email_id, pwd) = get_email_pwd()
-    print(name, email_id, pwd)
-    status = manager.register(User(name, email_id, pwd))
-    return (status, email_id)
+    def add_task(self,manager: TaskManager, email):
+        self.show_tasks(manager, email)
+        try:
+            task = input("Enter task to add(enter \'a' to abort): ")
+            manager.add_task(email, Task(task))
+        except ValueError:
+            self.show_menu(manager, email), email
 
 
-def add_task(manager: TaskManager, email):
-    show_tasks(manager, email)
-    try:
-        task = input("Enter task to add(enter \'a' to abort): ")
-        manager.add_task(email, Task(task))
-    except ValueError:
-        show_menu(manager, email), email
+    def show_tasks(self,manager: TaskManager, email):
+        manager.show_tasks(email)
 
 
-def show_tasks(manager: TaskManager, email):
-    manager.show_tasks(email)
+    def delete_task(self,manager: TaskManager, email):
+        self.show_tasks(manager, email)
+        task = input("Enter task to delete(enter \'a' to abort,\'all\' to delete all): ")
+        if task == 'a':
+            self.show_menu(manager, email)
+        elif task == 'all':
+            manager.delete_task(email, Task(task), True)
+        else:
+            manager.delete_task(email, Task(task))
 
 
-def delete_task(manager: TaskManager, email):
-    show_tasks(manager, email)
-    task = input("Enter task to delete(enter \'a' to abort,\'all\' to delete all): ")
-    if task == 'a':
-        show_menu(manager, email)
-    elif task == 'all':
-        manager.delete_task(email, Task(task), True)
-    else:
-        manager.delete_task(email, Task(task))
+    def mark_complete(self,manager: TaskManager, email):
+        self.show_tasks(manager, email)
+        task = input("Enter task to mark(enter \'a' to abort, \'all\' to mark all as completed): ")
+        if task == 'a':
+            self.show_menu(manager, email)
+        elif task == 'all':
+            manager.mark_task_completed(email, Task(task), True)
+        else:
+            manager.mark_task_completed(email, Task(task))
 
 
-def mark_complete(manager: TaskManager, email):
-    show_tasks(manager, email)
-    task = input("Enter task to mark(enter \'a' to abort, \'all\' to mark all as completed): ")
-    if task == 'a':
-        show_menu(manager, email)
-    elif task == 'all':
-        manager.mark_task_completed(email, Task(task), True)
-    else:
-        manager.mark_task_completed(email, Task(task))
-
-
-def show_menu(manager: TaskManager, email):
-    menu = ['Add Task', 'View Tasks', 'Delete Task', 'Mark Task completed', 'Exit']
-    print('*******************************************************************')
-    print("Now you can add tasks, delete tasks and mark tasks as completed   *  ")
-    print("You can also see your tasks and their status                      *")
-    print("********************************************************************")
-    print()
-    should_run = True
-
-    while should_run:
-        print("Enter the number of the action you want to perform.")
+    def show_menu(self,manager: TaskManager, email):
+        menu = ['Add Task', 'View Tasks', 'Delete Task', 'Mark Task completed', 'Exit']
+        print('*******************************************************************')
+        print("Now you can add tasks, delete tasks and mark tasks as completed   *  ")
+        print("You can also see your tasks and their status                      *")
+        print("********************************************************************")
         print()
-        for i, v in enumerate(menu):
-            print("%d. %s " % (i + 1, v))
+        should_run = True
+
+        while should_run:
+            print("Enter the number of the action you want to perform.")
+            print()
+            for i, v in enumerate(menu):
+                print("%d. %s " % (i + 1, v))
+            try:
+                choice = int(input())
+            except ValueError:
+                choice = 5
+            if choice == 1:
+                self.add_task(manager, email)
+            elif choice == 2:
+                self.show_tasks(manager, email)
+            elif choice == 3:
+                self.delete_task(manager, email)
+            elif choice == 4:
+                self.mark_complete(manager, email)
+            else:
+                print('exiting...')
+                should_run = False
+
+    def start(self):
+        welcome = '\n\n\nWelcome to TasK Manager, your one stop app for managing daily tasks'
+        login_prompt = "\nType 1 to login, 2 to register\n"
+        options = ['Login', 'Register', 'Quit']
+        inputs = ['Name', 'email id', 'Password']
+        manager = TaskManager()
+        print('           ', welcome)
+        print(login_prompt)
+        for i, v in enumerate(options):
+            print("%d. %s" % (i + 1, v))
+
         try:
             choice = int(input())
+            if choice == 1:
+                (status, email) = self.login(manager)
+                if status:
+                    self.show_menu(manager, email)
+                else:
+                    print('\nYou are not registered...')
+                    (status, email) = self.register(manager)
+                    if status:
+                        self.show_menu(manager, email)
+            elif choice == 2:
+                (status, email) = self.register(manager)
+                if status:
+                    self.show_menu(manager, email)
+                else:
+                    sys.exit(0)
         except ValueError:
-            choice = 5
-        if choice == 1:
-            add_task(manager, email)
-        elif choice == 2:
-            show_tasks(manager, email)
-        elif choice == 3:
-            delete_task(manager, email)
-        elif choice == 4:
-            mark_complete(manager, email)
-        else:
-            print('exiting...')
-            should_run = False
+            sys.exit(0)
 
 
 if __name__ == '__main__':
 
-    welcome = '\n\n\nWelcome to TasK Manager, your one stop app for managing daily tasks'
-    login_prompt = "\nType 1 to login, 2 to register\n"
-    options = ['Login', 'Register', 'Quit']
-    inputs = ['Name', 'email id', 'Password']
-    manager = TaskManager()
-    print('           ', welcome)
-    print(login_prompt)
-    for i, v in enumerate(options):
-        print("%d. %s" % (i + 1, v))
-
-    try:
-        choice = int(input())
-        if choice == 1:
-            (status, email) = login(manager)
-            if status:
-                show_menu(manager, email)
-            else:
-                print('\nYou are not registered...')
-                (status, email) = register(manager)
-                if status:
-                    show_menu(manager, email)
-        elif choice == 2:
-            (status, email) = register(manager)
-            if status:
-                show_menu(manager, email)
-            else:
-                sys.exit(0)
-    except ValueError:
-        sys.exit(0)
+    Main().start()
