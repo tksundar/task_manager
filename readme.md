@@ -20,19 +20,19 @@ Some screenshots of the various use cases are given below
 
 ### Opening screen ###
 
-![](C:\Users\tksra\PycharmProjects\Task_Manager\images\tm_1.png)
+<p><img src="task_manager/images/tm_1.png"/> </p>
 
 ### login screen ###
-![](C:\Users\tksra\PycharmProjects\Task_Manager\images\tm_login.png)
+<p><img src="task_manager/images/tm_login.png"/></p>
 
 ### Registration Screen ###
-![](C:\Users\tksra\PycharmProjects\Task_Manager\images\tm_new_registration.png)
+<p><img src="task_manager/images/tm_new_registration.png"/></p>
 
 ### Add Task Screen ###
-![](C:\Users\tksra\PycharmProjects\Task_Manager\images\add_task.png)
+<p><img src="task_manager/images/add_task.png"/></p>
 
 ### View and Mark Tasks Screen ###
-![](C:\Users\tksra\PycharmProjects\Task_Manager\images\view_and_mark.png)
+<p><img src="task_manager/images/view_and_mark.png"/></p>
 
 ### Delete Task Screen ###
-![](C:\Users\tksra\PycharmProjects\Task_Manager\images\tm_delete_task.png)
+<p><img src="task_manager/images/tm_delete_task.png"/></p>
