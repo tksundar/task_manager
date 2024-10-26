@@ -176,7 +176,7 @@ class Main:
         print('\n\nTask Manager Login...\n')
         (email_id, pwd) = self.get_email_pwd()
         status = manager.authenticate(email_id,pwd)
-        return (status, email_id)
+        return status, email_id
 
 
     def register(self,manager: TaskManager):
@@ -185,7 +185,7 @@ class Main:
         (email_id, pwd) = self.get_email_pwd()
         print(name, email_id, pwd)
         status = manager.register(User(name, email_id, pwd))
-        return (status, email_id)
+        return status, email_id
 
 
     def add_task(self,manager: TaskManager, email):
