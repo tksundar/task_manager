@@ -36,3 +36,7 @@ Some screenshots of the various use cases are given below
 
 ### Delete Task Screen ###
 <p><img src="images/tm_delete_task.png"/></p>
+
+### Usage ###
+Download the repo using the git command _git pull https://github.com/tksundar/task_manager.git_<p/>
+run _python task_manager_
