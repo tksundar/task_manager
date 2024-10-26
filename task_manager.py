@@ -68,16 +68,6 @@ class Task:
     def __hash__(self):
         return hash(self.task_name)
 
-
-def _contains(stored_tasks, task):
-    contains = False
-    for t in stored_tasks:
-        if t.task_name == task.task_name:
-            contains = True
-    return contains
-
-
-
 class TaskManager:
     def __init__(self):
         if path.exists(task_file):
