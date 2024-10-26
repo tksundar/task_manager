@@ -60,10 +60,13 @@ class Task:
     def is_completed(self):
         return self.completed
 
-    # def __eq__(self, other):
-    #     if not isinstance(other,Task):
-    #         return False
-    #     return other.task_name == self.task_name
+    def __eq__(self, other):
+        if not isinstance(other,Task):
+            return False
+        return other.task_name == self.task_name
+
+    def __hash__(self):
+        return hash(self.task_name)
 
 
 def _contains(stored_tasks, task):
@@ -72,6 +75,7 @@ def _contains(stored_tasks, task):
         if t.task_name == task.task_name:
             contains = True
     return contains
+
 
 
 class TaskManager:
@@ -117,7 +121,7 @@ class TaskManager:
             stored_tasks = set()
             stored_tasks.add(task)
             print("Task %s successfully added " % task.task_name)
-        elif not _contains(stored_tasks, task):
+        elif not task in stored_tasks: #this works b/c __eq__ and __hash__ has been overridden
             stored_tasks.add(task)
             print("Task %s successfully added " % task.task_name)
         else:
@@ -286,5 +290,4 @@ class Main:
 
 
 if __name__ == '__main__':
-
     Main().start()
